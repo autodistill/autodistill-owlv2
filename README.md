@@ -32,6 +32,9 @@ pip3 install autodistill-owlv2
 
 ```python
 from autodistill_owlv2 import OWLv2
+from autodistill.detection import CaptionOntology
+from autodistill.utils import plot
+import cv2
 
 # define an ontology to map class names to our OWLv2 prompt
 # the ontology dictionary has the format {caption: class}
@@ -42,10 +45,21 @@ base_model = OWLv2(
     ontology=CaptionOntology(
         {
             "person": "person",
-            "a forklift": "forklift"
+            "dog": "dog"
         }
     )
 )
+
+# run inference on a single image
+results = base_model.predict("dog.jpeg")
+
+plot(
+    image=cv2.imread("dog.jpeg"),
+    classes=base_model.ontology.classes(),
+    detections=results
+)
+
+# label a folder of images
 base_model.label("./context_images", extension=".jpeg")
 ```
 
