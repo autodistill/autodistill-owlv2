@@ -34,14 +34,20 @@ class OWLv2(DetectionBaseModel):
         )
         self.model = Owlv2ForObjectDetection.from_pretrained(
             "google/owlv2-base-patch16-ensemble"
-        )
+        ).to(DEVICE)  # Move the model to the appropriate device
         self.ontology = ontology
 
     def predict(self, input: Any, confidence: int = 0.1) -> sv.Detections:
         image = load_image(input, return_format="PIL")
+        
+        # Check if the image is in RGB format
+        if image.mode != "RGB":
+            print("Error: Only RGB images are supported for the model")
+            return sv.Detections.empty()  # Return an empty detection if the image is not RGB
+
         texts = [self.ontology.prompts()]
 
-        inputs = self.processor(text=texts, images=image, return_tensors="pt")
+        inputs = self.processor(text=texts, images=image, return_tensors="pt").to(DEVICE)
         outputs = self.model(**inputs)
 
         target_sizes = torch.Tensor([image.size[::-1]])
