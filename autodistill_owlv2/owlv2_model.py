@@ -37,7 +37,7 @@ class OWLv2(DetectionBaseModel):
         )
         self.ontology = ontology
 
-    def predict(self, input: Any, confidence: int = 0.1) -> sv.Detections:
+    def predict(self, input: Any, confidence: float = 0.1) -> sv.Detections:
         image = load_image(input, return_format="PIL")
         texts = [self.ontology.prompts()]
 
